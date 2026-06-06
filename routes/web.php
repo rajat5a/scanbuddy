@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CafeController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\MenuItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -109,6 +112,11 @@ Route::middleware('auth')->group(function () {
         return view('pages.ui-elements.videos', ['title' => 'Videos']);
     })->name('videos');
 
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/menu-items/create', [MenuItemController::class, 'create'])->name('menu-items.create');
+    Route::post('/menu-items', [MenuItemController::class, 'store'])->name('menu-items.store');
+    Route::get('/menu-items', [MenuItemController::class, 'index'])->name('menu-items.index');
+
 });
 
 
@@ -117,6 +125,10 @@ Route::middleware('auth')->group(function () {
 | 3. OPEN ROUTES (Sabke Liye)
 |--------------------------------------------------------------------------
 */
+
+// Cafe Menu Route (Publicly visible to customers via QR)
+Route::get('/cafe/{slug}', [CafeController::class, 'show'])->name('cafe.menu');
+
 // error pages (Ise open rakha hai taaki error aane par sabko dikhe)
 Route::get('/error-404', function () {
     return view('pages.errors.error-404', ['title' => 'Error 404']);
