@@ -113,9 +113,14 @@ Route::middleware('auth')->group(function () {
     })->name('videos');
 
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::resource('categories', App\Http\Controllers\CategoryController::class)->except(['create', 'show']);
+
     Route::get('/menu-items/create', [MenuItemController::class, 'create'])->name('menu-items.create');
     Route::post('/menu-items', [MenuItemController::class, 'store'])->name('menu-items.store');
     Route::get('/menu-items', [MenuItemController::class, 'index'])->name('menu-items.index');
+    Route::delete('/menu-items/{id}', [MenuItemController::class, 'destroy'])->name('menu-items.destroy');
+    Route::get('/menu-items/{id}/edit', [MenuItemController::class, 'edit'])->name('menu-items.edit');
+    Route::put('/menu-items/{id}', [MenuItemController::class, 'update'])->name('menu-items.update');
 
 });
 

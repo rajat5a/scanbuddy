@@ -18,5 +18,13 @@ class AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') !== 'local') {
             URL::forceScheme('https');
         }
+
+        // Sidebar mein Cafe dynamic data dikhane ke liye
+        \Illuminate\Support\Facades\View::composer('layouts.sidebar', function ($view) {
+            if (\Illuminate\Support\Facades\Auth::check()) {
+                $currentCafe = \App\Models\Cafe::where('user_id', \Illuminate\Support\Facades\Auth::id())->first();
+                $view->with('currentCafe', $currentCafe);
+            }
+        });
     }
 }

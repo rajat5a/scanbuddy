@@ -11,8 +11,8 @@ class MenuItemController extends Controller
 {
     public function create()
     {
-        // View mein category dropdown dikhane ke liye categories fetch karein
-        $categories = Auth::user()->cafes()->first()->categories;
+        $cafe = Auth::user()->cafes()->first();
+        $categories = $cafe->categories; // Sirf us cafe ki categories
         return view('pages.menu-items.create', compact('categories'));
     }
 
@@ -20,21 +20,27 @@ class MenuItemController extends Controller
     {
         $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string',
-            'price' => 'required|numeric',
+            'name'        => 'required|string|max:255',
+            'price'       => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:1000', 
         ]);
 
         $cafe = Auth::user()->cafes()->first();
 
-        MenuItem::create([
-            'cafe_id' => $cafe->id,
+        // Cafe milna zaroori hai, warna error handle karein
+        if (!$cafe) {
+            return back()->with('error', 'Cafe not found!');
+        }
+
+        // Mass assignment use karein
+        $cafe->menuItems()->create([
             'category_id' => $request->category_id,
-            'name' => $request->name,
+            'name'        => $request->name,
             'description' => $request->description,
-            'price' => $request->price,
+            'price'       => $request->price,
         ]);
 
-        return back()->with('success', 'Menu Item added successfully!');
+        return redirect()->route('menu-items.index')->with('success', 'Menu Item added successfully!');
     }
 
     public function index()
@@ -54,5 +60,37 @@ class MenuItemController extends Controller
         });
 
         return view('pages.menu-items.index', compact('menuItems'));
+    }
+
+    public function edit($id)
+    {
+        // Sirf wahi item milna chahiye jo CURRENT USER ke cafe ka ho
+        $item = MenuItem::whereHas('cafe', function($query) {
+            $query->where('user_id', Auth::id());
+        })->findOrFail($id);
+
+        $categories = Category::where('cafe_id', $item->cafe_id)->get();
+        return view('pages.menu-items.edit', compact('item', 'categories'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'name'        => 'required|string|max:255',
+            'price'       => 'required|numeric|min:0',
+        ]);
+
+        $item = \App\Models\MenuItem::findOrFail($id);
+        $item->update($request->all());
+
+        return redirect()->route('menu-items.index')->with('success', 'Item updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $menuItem = \App\Models\MenuItem::findOrFail($id);
+        $menuItem->delete();
+        return redirect()->back()->with('success', 'Item deleted successfully!');
     }
 }

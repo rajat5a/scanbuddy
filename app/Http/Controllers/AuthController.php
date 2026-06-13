@@ -52,26 +52,31 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // 1. Validation: Check if all fields are correct
         $request->validate([
             'fname'    => 'required|string|max:50',
             'lname'    => 'required|string|max:50',
             'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8', // Agar password confirmation hai toh 'confirmed' add karein
+            'password' => 'required|string|min:8',
         ]);
 
-        // 2. User Creation: Merging first and last name
+        // 1. User Create Karein
         $user = User::create([
             'name'     => $request->fname . ' ' . $request->lname,
             'email'    => $request->email,
-            'password' => Hash::make($request->password), // Password ko encrypt karna zaroori hai
+            'password' => Hash::make($request->password),
         ]);
 
-        // 3. Auto Login: Signup ke baad user ko sidha login karwa dena
+        // 2. Naya Cafe Automatically Create Karein (User ke liye)
+        $user->cafes()->create([
+            'name'        => ($request->fname . "'s Cafe"), // Default name
+            'slug'        => \Illuminate\Support\Str::slug($request->fname . '-cafe'), 
+            'description' => 'Welcome to my digital menu!',
+        ]);
+
+        // 3. Login aur Redirect
         Auth::login($user);
 
-        // 4. Redirect: Success message ke saath dashboard par bhejein
-        return redirect()->route('dashboard')->with('success', 'Account created successfully! Welcome to ScanBuddy.');
+        return redirect()->route('dashboard')->with('success', 'Account & Cafe created! Welcome to ScanBuddy.');
     }
 }
 

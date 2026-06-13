@@ -21,4 +21,22 @@ class CategoryController extends Controller
 
         return back()->with('success', 'Category added successfully!');
     }
+
+    public function index()
+    {
+        $cafe = Auth::user()->cafes()->first();
+        $categories = $cafe->categories()->orderBy('sort_order')->get();
+        return view('pages.categories.index', compact('categories'));
+    }
+
+    public function destroy(Category $category)
+    {
+        // Security: Sirf apna hi category delete karne dein
+        if ($category->cafe->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $category->delete();
+        return back()->with('success', 'Category deleted!');
+    }
 }

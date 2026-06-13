@@ -5,6 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heroicons@2.1.1/dist/heroicons.min.js"></script>
+    
 
     <title>{{ $title ?? 'Dashboard' }} | TailAdmin - Laravel Tailwind CSS Admin Dashboard Template</title>
 
@@ -134,5 +138,28 @@
 </body>
 
 @stack('scripts')
+
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Deleted!',
+        text: '{{ session('success') }}',
+        showConfirmButton: false,
+        timer: 1500
+    });
+</script>
+@endif
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Success!', 
+        text: '{{ session('success') }}',
+        showConfirmButton: false,
+        timer: 1500
+    });
+</script>
+@endif
 
 </html>
