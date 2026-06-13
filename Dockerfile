@@ -26,5 +26,5 @@ RUN composer install --ignore-platform-reqs --no-interaction
 # 6. Tailwind aur Alpine.js build karna
 RUN npm install && npm run build
 
-# 7. Server start karna
-CMD sh -c "php artisan serve --host=0.0.0.0 --port=\${PORT:-8000}"
+# 7. Server start karna (Migration ke saath)
+CMD sh -c "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"
